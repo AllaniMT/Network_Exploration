@@ -3,6 +3,8 @@ import json
 import pprint
 from pymongo import MongoClient
 
+#Determinate the Ip to be scanned
+theScannedIp = "172.18.231.178"
 
 def connectAndUpdateToDB(packet):
     # Determinate the host and the port number of mongodb
@@ -20,12 +22,21 @@ def connectAndUpdateToDB(packet):
     return collectionName.insert_one({"packet": foundedPacketConvertedInJson})
 
 
-def scanNetwork():
+def scanNetwork(theIP):
+    #Create new scanner
     nMapPortScanner = nmap.PortScanner()
-    nMapScanner = nMapPortScanner.scan(hosts="172.18.231.178")
+
+    #Determintate the ip, that we want to explore
+    nMapScanner = nMapPortScanner.scan(hosts=theIP)
+
+    #Write the result of the scan as a variable
     resultOfScan = nMapScanner['scan']
+
+    #Save the result in the database
     connectAndUpdateToDB(resultOfScan)
+
+    #Print the result as pretty json object
     return pprint.pprint(resultOfScan)
 
-
-scanNetwork()
+#Run the scan
+scanNetwork(theScannedIp)
